@@ -1,21 +1,27 @@
 <script lang="ts">
+  import { goto } from "$app/navigation";
+  import { loggedInUser } from "$lib/runes.svelte";
   import Message from "$lib/ui/Message.svelte";
   import UserCredentials from "$lib/ui/UserCredentials.svelte";
 
   // Local form state for the login inputs.
-  // These values are updated through the UserCredentials component.
+  // These values are updated through the reusable UserCredentials component.
   let email = $state("");
   let password = $state("");
   let message = $state("");
 
   async function login() {
-    // Real API login will vbe added later when the service layer is introduced.
-    const success = false;
+    // Temporarily forces login success (per lab 18b)
+    // This proves that the shared loggedInUser rune can control the app layout.
+    const success = true;
 
     if (success) {
-      message = "";
+      loggedInUser.email = email;
+      goto("/dashboard");
     } else {
-      message = "Error trying to log in";
+      email = "";
+      password = "";
+      message = "Invalid Credentials";
     }
   }
 </script>
