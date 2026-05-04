@@ -1,44 +1,58 @@
-import axios from "axios";
-import type { Session, User } from "$lib/types/dog-destination-types";
+import axios from 'axios';
+import { loggedInUser } from '$lib/runes.svelte';
+import type { Session, User } from '$lib/types/dog-destination-types';
 
 export const dogDestinationService = {
-  // Base URL of the existing Dog Destinations HAPI API.
-  baseUrl: "http://localhost:3000",
+	// Base URL of the existing Dog Destinations HAPI API.
+	baseUrl: 'http://localhost:3000',
 
-  async signup(user: User): Promise<boolean> {
-    try {
-      const response = await axios.post(`${this.baseUrl}/api/users`, user);
-      return response.status === 201 || response.data.success === true;
-    } catch (error) {
-      console.log(error);
-      return false;
-    }
-  },
+	async signup(user: User): Promise<boolean> {
+		try {
+			const response = await axios.post(`${this.baseUrl}/api/users`, user);
+			return response.status === 201 || response.data.success === true;
+		} catch (error) {
+			console.log(error);
+			return false;
+		}
+	},
 
-  async login(email: string, password: string): Promise<Session | null> {
-    try {
-      const response = await axios.post(`${this.baseUrl}/api/users/authenticate`, {
-        email,
-        password
-      });
+	async login(email: string, password: string): Promise<Session | null> {
+		try {
+			const response = await axios.post(`${this.baseUrl}/api/users/authenticate`, {
+				email,
+				password
+			});
 
-      if (response.data.success) {
-        // Store the JWT as a Bearer token for later protected API requests.
-        axios.defaults.headers.common["Authorization"] = "Bearer " + response.data.token;
+			if (response.data.success) {
+				// Store the JWT as a Bearer token for later protected API requests.
+				axios.defaults.headers.common['Authorization'] = 'Bearer ' + response.data.token;
 
-        const session: Session = {
-          name: response.data.name,
-          token: response.data.token,
-          _id: response.data._id
-        };
+				const session: Session = {
+					name: response.data.name,
+					token: response.data.token,
+					_id: response.data._id
+				};
 
-        return session;
-      }
+				this.saveSession(session, email);
 
-      return null;
-    } catch (error) {
-      console.log(error);
-      return null;
-    }
-  }
+				return session;
+			}
+
+			return null;
+		} catch (error) {
+			console.log(error);
+			return null;
+		}
+	},
+
+	saveSession(session: Session, email: string) {
+		// Store the logged-in user details in the shared rune.
+		loggedInUser.email = email;
+		loggedInUser.name = session.name;
+		loggedInUser.token = session.token;
+		loggedInUser._id = session._id;
+
+		// Store the session in browser localStorage so it survives page refresh.
+		localStorage.dogDestinations = JSON.stringify(loggedInUser);
+	}
 };
