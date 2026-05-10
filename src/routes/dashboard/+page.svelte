@@ -1,23 +1,48 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
-	import { loggedInUser, subTitle } from '$lib/runes.svelte';
-	import { dogDestinationService } from '$lib/services/dog-destination-service';
-	import DogDestinationList from '$lib/ui/DogDestinationList.svelte';
-	import type { DogDestination } from '$lib/types/dog-destination-types';
+  import { onMount } from "svelte";
+  import { loggedInUser, subTitle } from "$lib/runes.svelte";
+  import { dogDestinationService } from "$lib/services/dog-destination-service";
+  import { buildDestinationsByCategoryChart } from "$lib/services/analytics-utils";
+  import Card from "$lib/ui/Card.svelte";
+  import DogDestinationList from "$lib/ui/DogDestinationList.svelte";
+  import type { DogDestination } from "$lib/types/dog-destination-types";
 
-	// This page updates the shared heading text shown by Heading.svelte.
-	subTitle.text = 'Dashboard';
+  // @ts-ignore
+  import Chart from "svelte-frappe-charts";
 
-	// Local dashboard state for dog destinations returned from the HAPI API.
-	let dogDestinations = $state<DogDestination[]>([]);
+  // This page updates the shared heading text shown by Heading.svelte.
+  subTitle.text = "Dashboard";
 
-	// Lab 19a pattern: when the page loads, request API data through the service layer.
-	onMount(async () => {
-		dogDestinations = await dogDestinationService.getDogDestinations(loggedInUser.token);
-	});
+  // Local dashboard state for dog destinations returned from the HAPI API.
+  let dogDestinations = $state<DogDestination[]>([]);
+
+  // Chart data summarising how many destinations exist in each category.
+  let destinationsByCategory = $state({
+    labels: [],
+    datasets: [
+      {
+        name: "Destinations",
+        values: []
+      }
+    ]
+  });
+
+  // Lab 19a / 21a pattern: when the page loads, request API data through the service layer.
+  onMount(async () => {
+    dogDestinations = await dogDestinationService.getDogDestinations(loggedInUser.token);
+
+    // Prepare the raw API data into the format required by the chart component.
+    destinationsByCategory = buildDestinationsByCategoryChart(dogDestinations);
+  });
 </script>
 
-<!-- Dashboard route displaying real dog destination data from the HAPI API -->
+<!-- Dashboard route displaying real dog destination data and a single analytics chart -->
 <p class="mb-4">Welcome to your Dog Destinations dashboard.</p>
 
-<DogDestinationList {dogDestinations} />
+<Card title="Destinations by Category">
+  <Chart data={destinationsByCategory} type="bar" />
+</Card>
+
+<Card title="Dog Destinations">
+  <DogDestinationList {dogDestinations} />
+</Card>
