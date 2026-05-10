@@ -22,7 +22,7 @@
       {#each dogDestinations as destination}
         <tr>
           <td>{destination.name}</td>
-          <td>{destination.category}</td>
+          <td>{destination.category.name}</td>
           <td>{destination.description}</td>
           <td>{destination.latitude}</td>
           <td>{destination.longitude}</td>
