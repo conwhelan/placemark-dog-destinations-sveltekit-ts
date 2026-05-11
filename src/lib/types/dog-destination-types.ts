@@ -33,7 +33,8 @@ export interface DogDestination {
 	description: string;
 	latitude: number;
 	longitude: number;
+  img?: string;
 	userid?: Id;
 	_id?: Id;
 	__v?: number;
-}
+  }
