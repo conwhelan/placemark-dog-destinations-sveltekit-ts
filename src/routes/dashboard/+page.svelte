@@ -34,6 +34,16 @@
     // Prepare the raw API data into the format required by the chart component.
     destinationsByCategory = buildDestinationsByCategoryChart(dogDestinations);
   });
+
+  async function deleteDestinationImage(id: string) {
+    const success = await dogDestinationService.deleteImage(id, loggedInUser.token);
+
+    if (success) {
+      // Refresh the dashboard data so the deleted image disappears from the card.
+      dogDestinations = await dogDestinationService.getDogDestinations(loggedInUser.token);
+      destinationsByCategory = buildDestinationsByCategoryChart(dogDestinations);
+    }
+  }
 </script>
 
 <!-- Dashboard route displaying real dog destination data and a single analytics chart -->
@@ -44,5 +54,5 @@
 </Card>
 
 <Card title="Dog Destinations">
-  <DogDestinationList {dogDestinations} />
+  <DogDestinationList {dogDestinations} imageDeleteEvent={deleteDestinationImage} />
 </Card>

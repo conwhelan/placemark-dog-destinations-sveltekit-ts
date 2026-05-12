@@ -67,5 +67,19 @@ export const dogDestinationService = {
       console.log(error);
       return [];
     }
+  },
+
+  async deleteImage(id: string, token: string): Promise<boolean> {
+    try {
+      // Use the logged-in user's JWT token when calling the protected HAPI API route.
+      axios.defaults.headers.common["Authorization"] = "Bearer " + token;
+
+      const response = await axios.delete(`${this.baseUrl}/api/dogdestinations/${id}/image`);
+
+      return response.data.success === true;
+    } catch (error) {
+      console.log(error);
+      return false;
+    }
   }
 };
