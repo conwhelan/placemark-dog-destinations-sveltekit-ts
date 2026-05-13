@@ -16,7 +16,12 @@
     // Retrieve dog destinations from the HAPI API using the logged-in JWT token.
     const dogDestinations = await dogDestinationService.getDogDestinations(loggedInUser.token);
 
-    // Add a marker for each destination returned by the API.
+    // First create one Leaflet layer group for each category.
+    dogDestinations.forEach((destination: DogDestination) => {
+      map.addLayerGroup(destination.category.name);
+    });
+
+    // Then add each marker to its matching category layer.
     dogDestinations.forEach((destination: DogDestination) => {
       const popup = `
         <strong>${destination.name}</strong><br>
@@ -24,12 +29,17 @@
         ${destination.description}
       `;
 
-      map.addMarker(destination.latitude, destination.longitude, popup);
+      map.addMarker(
+        destination.latitude,
+        destination.longitude,
+        popup,
+        destination.category.name
+      );
     });
   });
 </script>
 
 <!-- Map route displaying dog-friendly destinations geographically -->
-<Card title="Dog-Friendly Locations">
+<Card title="Dog-Friendly Locations by Category">
   <LeafletMap height={60} bind:this={map} />
 </Card>

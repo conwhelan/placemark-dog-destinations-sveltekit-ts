@@ -20,6 +20,7 @@
   let imap: LeafletMap;
   let control: Control.Layers;
   let overlays: Control.LayersObject = {};
+  let layerGroups: Record<string, any> = {};
   let baseLayers: any;
   let L: any;
 
@@ -51,19 +52,38 @@
     control = leaflet.control.layers(baseLayers, overlays).addTo(imap);
   });
 
+  // Creates a named overlay layer group that can be toggled in the Leaflet layer control.
+  export function addLayerGroup(title: string) {
+    if (!layerGroups[title]) {
+      layerGroups[title] = L.layerGroup().addTo(imap);
+      overlays[title] = layerGroups[title];
+
+      // Refresh the layer control so the new category layer appears.
+      control.remove();
+      control = L.control.layers(baseLayers, overlays).addTo(imap);
+    }
+  }
+
+
   // Adds a marker to the map using destination latitude and longitude values.
   // The popup displays destination information when the marker is clicked.
-  export async function addMarker(lat: number, lng: number, popupText: string) {
+  export async function addMarker(lat: number, lng: number, popupText: string, layerTitle: string = "") {
     const leaflet = await import("leaflet");
     L = leaflet.default;
 
-    const marker = L.marker([lat, lng]).addTo(imap);
+    const marker = L.marker([lat, lng]);
 
     const popup = L.popup({ autoClose: false, closeOnClick: false });
 
     popup.setContent(popupText);
 
     marker.bindPopup(popup);
+
+    if (layerTitle && layerGroups[layerTitle]) {
+      marker.addTo(layerGroups[layerTitle]);
+    } else {
+      marker.addTo(imap);
+    }
   }
 
 </script>
