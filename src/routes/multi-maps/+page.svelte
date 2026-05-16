@@ -10,10 +10,18 @@
 
 	let allDestinationsMap: LeafletMap;
 	let latestDestinationMap: LeafletMap;
+	let latestDestinationName = $state('Latest Dog Destination');
 
 	onMount(async () => {
 		const dogDestinations = await dogDestinationService.getDogDestinations(loggedInUser.token);
 
+		// Create the Category layer on the main map for each Dog Destination category.
+		// Preveserves map Layers based on Categories.
+		dogDestinations.forEach((destination: DogDestination) => {
+			allDestinationsMap.addLayerGroup(destination.category.name);
+		});
+
+		// Then, add all destination markers to their matching Category Layer.
 		dogDestinations.forEach((destination: DogDestination) => {
 			const popup = `
         <strong>${destination.name}</strong><br>
@@ -21,12 +29,20 @@
         ${destination.description}
       `;
 
-			allDestinationsMap.addMarker(destination.latitude, destination.longitude, popup);
+			allDestinationsMap.addMarker(
+				destination.latitude,
+				destination.longitude,
+				popup,
+				destination.category.name
+			);
 		});
 
+		// 2nd map highlights the latest destination only.
+		// Added for Level 3: Multiple Maps on a single page.
 		const latestDestination = dogDestinations[dogDestinations.length - 1];
 
 		if (latestDestination) {
+			latestDestinationName = `Latest Dog Destination: ${latestDestination.name}`;
 			const popup = `
         <strong>${latestDestination.name}</strong><br>
         ${latestDestination.category.name}<br>
@@ -38,22 +54,16 @@
 				latestDestination.longitude,
 				popup
 			);
-
+			//focus the map on the latest destination coords
 			latestDestinationMap.moveTo(latestDestination.latitude, latestDestination.longitude);
 		}
 	});
 </script>
 
-<div class="columns">
-	<div class="column">
-		<Card title="All Dog Destinations">
-			<LeafletMap height={50} mapId="all-destinations-map" bind:this={allDestinationsMap} />
-		</Card>
-	</div>
+<Card title="All Dog Destinations by Category">
+	<LeafletMap height={45} mapId="all-destinations-map" bind:this={allDestinationsMap} />
+</Card>
 
-	<div class="column">
-		<Card title="Latest Dog Destination">
-			<LeafletMap height={50} mapId="latest-destination-map" bind:this={latestDestinationMap} />
-		</Card>
-	</div>
-</div>
+<Card title={latestDestinationName}>
+	<LeafletMap height={45} mapId="latest-destination-map" bind:this={latestDestinationMap} />
+</Card>
