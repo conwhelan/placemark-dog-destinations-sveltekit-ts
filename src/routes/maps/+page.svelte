@@ -7,7 +7,7 @@
   import type { DogDestination } from "$lib/types/dog-destination-types";
 
   // Updates the shared page heading shown in Heading.svelte.
-  subTitle.text = "Dog Destinations Map";
+  subTitle.text = "Dog Destinations Maps";
 
   // Reference to the LeafletMap component so exported map functions can be called.
   let map: LeafletMap;
