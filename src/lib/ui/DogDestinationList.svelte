@@ -1,8 +1,15 @@
 <script lang="ts">
+	import type { DogDestination } from '$lib/types/dog-destination-types';
+
 	// List of dog destinations passed in from the dashboard page.
-	// per Lab 19a pattern where a parent page passes API data into a display component.
 	// imageDeleteEvent is an optional callback passed from the dashboard.
-	let { dogDestinations = [], imageDeleteEvent = null } = $props();
+	let {
+		dogDestinations = [],
+		imageDeleteEvent = null
+	}: {
+		dogDestinations: DogDestination[];
+		imageDeleteEvent?: ((id: string) => void) | null;
+	} = $props();
 </script>
 
 <!-- Displays dog destinations returned from the HAPI API -->
@@ -18,15 +25,31 @@
 								<img src={destination.img} alt={`Image for ${destination.name}`} />
 							</figure>
 						</div>
-						<div class="card-content pt-3">
+					{/if}
+
+					<div class="card-content">
+						<p class="title is-5">{destination.name}</p>
+
+						<span class="tag is-link is-light">
+							{destination.category.name}
+						</span>
+
+						<p class="mt-3">{destination.description}</p>
+
+						<p class="is-size-7 has-text-grey mt-3">
+							📍 {destination.latitude}, {destination.longitude}
+						</p>
+
+						{#if destination.img}
 							<button
-								class="button is-danger is-light is-small"
-								onclick={() => imageDeleteEvent && imageDeleteEvent(destination._id)}
+								class="button is-danger is-light is-small mt-3"
+								onclick={() =>
+									destination._id && imageDeleteEvent && imageDeleteEvent(destination._id)}
 							>
 								Delete Image
 							</button>
-						</div>
-					{/if}
+						{/if}
+					</div>
 				</div>
 			</div>
 		{/each}

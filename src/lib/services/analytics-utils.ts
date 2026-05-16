@@ -1,7 +1,7 @@
 import type { DogDestination } from "$lib/types/dog-destination-types";
 
-// Builds chart data showing how many dog destinations exist in each category.
-export function buildDestinationsByCategoryChart(dogDestinations: DogDestination[]) {
+// Counts how many dog destinations exist in each category.
+function countDestinationsByCategory(dogDestinations: DogDestination[]) {
   const categoryCounts: Record<string, number> = {};
 
   dogDestinations.forEach((destination) => {
@@ -14,11 +14,32 @@ export function buildDestinationsByCategoryChart(dogDestinations: DogDestination
     }
   });
 
+  return categoryCounts;
+}
+
+// Builds bar chart data showing destination count by category.
+export function buildDestinationsByCategoryBarChart(dogDestinations: DogDestination[]) {
+  const categoryCounts = countDestinationsByCategory(dogDestinations);
+
   return {
     labels: Object.keys(categoryCounts),
     datasets: [
       {
         name: "Destinations",
+        values: Object.values(categoryCounts)
+      }
+    ]
+  };
+}
+
+// Builds pie chart data showing destination category distribution.
+export function buildDestinationsByCategoryPieChart(dogDestinations: DogDestination[]) {
+  const categoryCounts = countDestinationsByCategory(dogDestinations);
+
+  return {
+    labels: Object.keys(categoryCounts),
+    datasets: [
+      {
         values: Object.values(categoryCounts)
       }
     ]
