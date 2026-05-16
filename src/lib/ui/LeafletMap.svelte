@@ -26,6 +26,16 @@
 		const leaflet = await import('leaflet');
 		L = leaflet.default;
 
+		// Explicitly set Leaflet marker asset paths for deployed Netlify builds.
+		// The marker images are stored in static/images and served as /images/... in the browser.
+		delete L.Icon.Default.prototype._getIconUrl;
+
+		L.Icon.Default.mergeOptions({
+			iconRetinaUrl: '/images/marker-icon-2x.png',
+			iconUrl: '/images/marker-icon.png',
+			shadowUrl: '/images/marker-shadow.png'
+		});
+
 		// Base map layers. Terrain layer.
 		baseLayers = {
 			Terrain: leaflet.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -88,7 +98,7 @@
 	}
 
 	// Moves the map view to a specific latitude and longitude.
-	// This is useful when a parent page wants one map to focus on a selected or latest destination.
+	
 	export async function moveTo(lat: number, lng: number) {
 		const leaflet = await import('leaflet');
 		L = leaflet.default;
