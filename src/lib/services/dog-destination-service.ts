@@ -3,8 +3,8 @@ import { loggedInUser } from "$lib/runes.svelte";
 import type { DogDestination, Session, User } from "$lib/types/dog-destination-types";
 
 export const dogDestinationService = {
-  // Base URL of the existing Dog Destinations HAPI API.
-  baseUrl: "http://localhost:3000",
+  // Base URL of the dog Destinations HAPI API on render.
+  baseUrl: "https://placemark-dog-destinations-level2.onrender.com",
 
   async signup(user: User): Promise<boolean> {
     try {
